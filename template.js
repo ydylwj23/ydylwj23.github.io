@@ -31,6 +31,8 @@ var tooltip = d3.select("body")
   .text("a simple tooltip");
 const tooltipLine = svg.append('line');
 
+var currentScene;
+
 
 //Read the data
 d3.csv("rates.csv", function (data) {
@@ -369,18 +371,26 @@ d3.csv("rates.csv", function (data) {
     .on('click', () => scene(4));
   d3.select("#button5")
     .on('click', () => scene(5));
-  d3.select("#button6")
-    .on('click', () => scene(6));
+  d3.select("#next")
+    .on('click', () => {
+      if (currentScene < 5) {
+        scene(currentScene + 1);
+      }
+    });
+  d3.select("#reset")
+    .on('click', () => scene(0));
 
 
   var scene = n => {
+    //update scene number
+    currentScene = n;
     //special dates
     var date1 = parseDate('06-1984');
     var date2 = parseDate('04-1996');
     var date3 = parseDate('08-2006');
     var date4 = parseDate('05-2012');
 
-    if (n === 6) { //reset scene
+    if (n === 0) { //reset scene
       update(startDate);
       l1.style('display', 'none')
       l2.style('display', 'none')
@@ -455,7 +465,7 @@ d3.csv("rates.csv", function (data) {
   }
 
   //start with Reset state
-  scene(6);
+  scene(0);
 
 })
 
