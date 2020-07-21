@@ -17,6 +17,9 @@ var formatDateIntoYear = d3.timeFormat("%Y");
 var formatDate = d3.timeFormat("%b %Y");
 var parseDate = d3.timeParse("%m-%Y");
 
+var textTitle = d3.select('#title');
+var textContent = d3.select('#content');
+
 // tooltip
 // var tooltip = d3.select("body").append("div").attr("class", "tooltip");
 // const tooltip = d3.select('#tooltip');
@@ -212,6 +215,8 @@ d3.csv("rates.csv", function (data) {
 
   //update the slider
   var update = h => {
+    curtain.interrupt();
+    handle.interrupt();
     // update position and text of label according to slider scale
     handle.attr("cx", xSlider(h));
     label
@@ -230,8 +235,8 @@ d3.csv("rates.csv", function (data) {
     .data(legends)
     .enter()
     .append("circle")
-    .attr("cx", 100)
-    .attr("cy", function (d, i) { return 100 + i * 25 }) // 100 is where the first dot appears. 25 is the distance between dots
+    .attr("cx", 700)
+    .attr("cy", function (d, i) { return 50 + i * 25 }) // 100 is where the first dot appears. 25 is the distance between dots
     .attr("r", 7)
     .style("fill", function (d) { return color(d) })
 
@@ -240,8 +245,8 @@ d3.csv("rates.csv", function (data) {
     .data(legends)
     .enter()
     .append("text")
-    .attr("x", 120)
-    .attr("y", function (d, i) { return 100 + i * 25 }) // 100 is where the first dot appears. 25 is the distance between dots
+    .attr("x", 720)
+    .attr("y", function (d, i) { return 50 + i * 25 }) // 100 is where the first dot appears. 25 is the distance between dots
     .style("fill", function (d) { return color(d) })
     .text(function (d) { return d })
     .attr("text-anchor", "left")
@@ -250,8 +255,7 @@ d3.csv("rates.csv", function (data) {
   ////annotation
   const label1 = [{
     note: {
-      label: "A different annotation type",
-      title: "d3.annotationCalloutCircle",
+      label: "Highest fedral funds rate and mortage rate since 1971",
       wrap: 190
     },
     //settings for the subject, in this case the circle radius
@@ -261,10 +265,10 @@ d3.csv("rates.csv", function (data) {
     connector: {
       end: "arrow",
     },
-    x: 200,
-    y: 200,
-    dy: -80,
-    dx: 102
+    x: 260,
+    y: 70,
+    dy: -10,
+    dx: 60
   }]
   const makeAnnotation1 = d3.annotation()
     .annotations(label1)
@@ -277,8 +281,7 @@ d3.csv("rates.csv", function (data) {
 
   const label2 = [{
     note: {
-      label: "A different annotation type",
-      title: "d3.annotationCalloutCircle",
+      label: "Recession in the 90s",
       wrap: 190
     },
     //settings for the subject, in this case the circle radius
@@ -288,8 +291,8 @@ d3.csv("rates.csv", function (data) {
     connector: {
       end: "arrow",
     },
-    x: 300,
-    y: 200,
+    x: 490,
+    y: 270,
     dy: -80,
     dx: 102
   }]
@@ -304,8 +307,7 @@ d3.csv("rates.csv", function (data) {
 
   const label3 = [{
     note: {
-      label: "A different annotation type",
-      title: "d3.annotationCalloutCircle",
+      label: "Early 2000s recession",
       wrap: 190
     },
     //settings for the subject, in this case the circle radius
@@ -315,10 +317,10 @@ d3.csv("rates.csv", function (data) {
     connector: {
       end: "arrow",
     },
-    x: 400,
-    y: 200,
-    dy: -80,
-    dx: 102
+    x: 690,
+    y: 305,
+    dy: -100,
+    dx: 82
   }]
   const makeAnnotation3 = d3.annotation()
     .annotations(label3)
@@ -329,6 +331,33 @@ d3.csv("rates.csv", function (data) {
     .call(makeAnnotation3)
   var l3 = d3.select('#annotation3')
 
+
+  const label4 = [{
+    note: {
+      label: "Subprime mortgage crisis",
+      wrap: 190
+    },
+    //settings for the subject, in this case the circle radius
+    subject: {
+      radius: 50
+    },
+    connector: {
+      end: "arrow",
+    },
+    x: 800,
+    y: 330,
+    dy: -80,
+    dx: 50
+  }]
+  const makeAnnotation4 = d3.annotation()
+    .annotations(label4)
+    .type(d3.annotationCalloutCircle)
+  d3.select("svg")
+    .append("g")
+    .attr("id", "annotation4")
+    .call(makeAnnotation4)
+  var l4 = d3.select('#annotation4')
+
   //button event
   d3.select("#button1")
     .on('click', () => scene(1));
@@ -338,54 +367,95 @@ d3.csv("rates.csv", function (data) {
     .on('click', () => scene(3));
   d3.select("#button4")
     .on('click', () => scene(4));
+  d3.select("#button5")
+    .on('click', () => scene(5));
+  d3.select("#button6")
+    .on('click', () => scene(6));
+
 
   var scene = n => {
-    curtain.interrupt();
-    if (n === 4) {
+    //special dates
+    var date1 = parseDate('06-1984');
+    var date2 = parseDate('04-1996');
+    var date3 = parseDate('08-2006');
+    var date4 = parseDate('05-2012');
+
+    if (n === 6) { //reset scene
+      update(startDate);
       l1.style('display', 'none')
       l2.style('display', 'none')
       l3.style('display', 'none')
-      updateChart(startDate);
+      l4.style('display', 'none')
+      changeText("Myth?", "FOMC can adjust federal funds rate which directly impacts bank's products like savings account and CD rates.<br><br>But does it have same influence over the mortgage rate?");
     } else if (n === 1) {
-      updateChart(startDate);
+      update(startDate);
       l1.style('display', 'none')
       l2.style('display', 'none')
       l3.style('display', 'none')
-      curtain
-        .transition()
-        .duration(2000)
-        .ease(d3.easeLinear)
-        .attr('width', width - x(parseDate('08-1980')))
-        .on('end', () => l1.style('display', 'inline-block'));
+      l4.style('display', 'none')
+      HCto(date1, l1, 2000)
+      changeText("Collapse of Bretton Woods", "Marked by the collapse of Bretton Woods, US market faced great inflation during the 70s. To combat it, the federal funds rate was adjusted to a very high point.<br><br>During this time, the 30-year fixed mortgage rate also reached its highest point since 1971.");
     } else if (n === 2) {
+      update(date1);
       l1.style('display', 'inline-block')
       l2.style('display', 'none')
       l3.style('display', 'none')
-      curtain
-        .attr('width', width - x(parseDate('08-1980')));
-      curtain
-        .transition()
-        .duration(2000)
-        .ease(d3.easeLinear)
-        .attr('width', width - x(parseDate('08-1990')))
-        .on('end', () => l2.style('display', 'inline-block'));
+      l4.style('display', 'none')
+      HCto(date2, l2, 2000)
+      changeText("Recession in the 90s", "The 1990s began with a recession right out of the gate, although it lasted only eight months. The FOMC reduced fed funds rate through 1993 as it fought the recession.<br><br>The mortgage rate reacted to this by dropping as well, though not as much as the federal funds rate.");
     } else if (n === 3) {
+      update(date2);
       l1.style('display', 'inline-block')
       l2.style('display', 'inline-block')
       l3.style('display', 'none')
-      curtain
-        .attr('width', width - x(parseDate('08-1990')));
-      curtain
-        .transition()
-        .duration(2000)
-        .ease(d3.easeLinear)
-        .attr('width', width - x(parseDate('03-2018')))
-        .on('end', () => l3.style('display', 'inline-block'));
+      l4.style('display', 'none')
+      HCto(date3, l3, 1000)
+      changeText("Down again", "The aughts are known for their tumult. The the dot-com market crash, the terrorist attacks of 9/11 and a brief recession drove rates lower in the first half of the decade.");
+    } else if (n === 4) {
+      update(date3);
+      l1.style('display', 'inline-block')
+      l2.style('display', 'inline-block')
+      l3.style('display', 'inline-block')
+      l4.style('display', 'none')
+      HCto(date4, l4, 500)
+      changeText("The big bubble burst", "In the midst of the worst economic crisis since the Great Depression, the FOMC switched up their protocol once again, deciding in December 2008 to set a target range for federal funds, instead of a single rate. Since this is when the fed funds rate was at its lowest, we’re really looking at the lowest range in this instance. The lower limit of this band at the time was 0% and the upper limit was 0.25%.<br><br>Although it is pretty obvious that the mortgage rate cannot drop to 0, it still followed the trend and took same amount of time to recover from this.");
+    } else if (n === 5) {
+      update(date4);
+      l1.style('display', 'inline-block')
+      l2.style('display', 'inline-block')
+      l3.style('display', 'inline-block')
+      l4.style('display', 'inline-block')
+      HCto(endDate, l4, 500)
+      changeText("Conclusion", "As we can see, the Fed’s actions do indirectly influence the rates consumers pay on their fixed-rate home loans when they refinance or take out a new mortgage even though the Federal Reserve does not impact what happens to mortgage rates as directly as they do other products like savings account and CD rates.");
     }
+  }
+  //embed new text
+  var changeText = (t, c) => {
+    textTitle.html(t);
+    textContent.html(c);
+  }
+  //handle and curtain to location with transition
+  var HCto = (m, l, t) => {
+    label
+      .style('display', 'none');
+    curtain
+      .transition()
+      .duration(t)
+      .ease(d3.easeLinear)
+      .attr('width', width - x(m))
+      .on('end', () => {
+        l.style('display', 'inline-block');
+        label.attr("x", x(m)).text(formatDate(m)).style('display', 'inline-block');
+      });
+    handle
+      .transition()
+      .duration(t)
+      .ease(d3.easeLinear)
+      .attr('cx', x(m))
   }
 
   //start with Reset state
-  scene(4);
+  scene(6);
 
 })
 
