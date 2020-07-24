@@ -80,7 +80,24 @@ d3.csv("rates.csv", function (data) {
     .range([height, 0]).nice();
   svg.append("g")
     .attr("transform", "translate(-1, 0)")
-    .call(d3.axisLeft(y));
+    .call(d3.axisLeft(y).tickFormat(x => `${x}%`));
+
+  // text label for the x axis
+  svg.append("text")
+    .attr("transform",
+      "translate(" + (width / 2) + " ," +
+      (height + margin.top + 20) + ")")
+    .style("text-anchor", "middle")
+    .text("Date");
+
+  // text label for the y axis
+  svg.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - margin.left / 4 * 3)
+    .attr("x", 0 - (height / 2))
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Rate");
 
   // color palette
   var res = dataset.map(function (d) { return d.key }) // list of group names
